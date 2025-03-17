@@ -1,12 +1,37 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\ghoul\\Documents\\GitHub\\dungeongenerator\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{DE38EEFB-104D-C124-B51E-4B59AF97D94A}|Assembly-CSharp.csproj|c:\\users\\ghoul\\documents\\github\\dungeongenerator\\assets\\scripts\\dungeongenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE38EEFB-104D-C124-B51E-4B59AF97D94A}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\dungeongenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "DungeonGenerator.cs",
+              "DocumentMoniker": "C:\\Users\\ghoul\\Documents\\GitHub\\dungeongenerator\\Assets\\Scripts\\DungeonGenerator.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\DungeonGenerator.cs",
+              "ToolTip": "C:\\Users\\ghoul\\Documents\\GitHub\\dungeongenerator\\Assets\\Scripts\\DungeonGenerator.cs",
+              "RelativeToolTip": "Assets\\Scripts\\DungeonGenerator.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAAwEAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-17T13:12:24.273Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }
