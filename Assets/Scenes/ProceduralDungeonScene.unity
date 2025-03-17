@@ -410,6 +410,7 @@ MonoBehaviour:
   dungeonHeight: 100
   minRoomSize: 10
   maxSplits: 5
+  stepDelay: 0.05
 --- !u!4 &771648333
 Transform:
   m_ObjectHideFlags: 0
