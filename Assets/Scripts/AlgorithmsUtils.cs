@@ -60,6 +60,16 @@ public class AlgorithmsUtils
         }
     }
 
+    public static void DebugPoint(Vector2Int point, Color color, float duration = 0.5f)
+    {
+        Vector3 pos = new Vector3(point.x, 0, point.y); // Adjust for 2D/3D space
+        float size = 0.3f;
+
+        Debug.DrawLine(pos + Vector3.left * size, pos + Vector3.right * size, color, duration);
+        Debug.DrawLine(pos + Vector3.up * size, pos + Vector3.down * size, color, duration);
+    }
+
+
     public static void DebugRectInt(RectInt rectInt, Color color, float duration = 0f, bool depthTest = false, float height = 0.01f)
     {
         DebugExtension.DebugBounds(new Bounds(new Vector3(rectInt.center.x, 0, rectInt.center.y), new Vector3(rectInt.width, height, rectInt.height)), color, duration, depthTest);

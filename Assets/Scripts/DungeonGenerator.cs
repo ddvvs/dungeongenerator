@@ -9,29 +9,37 @@ public class DungeonGenerator : MonoBehaviour
     public int dungeonHeight;
     public int minRoomSize;
     public int maxSplits;
-    public float stepDelay;
+    public float stepDelay = 0.5f;
 
     private List<RectInt> rooms = new List<RectInt>();
+    private List<Vector2Int> doors = new List<Vector2Int>();
+    private Queue<RectInt> animationQueue = new Queue<RectInt>();
+
+    private HashSet<RectInt> drawnRooms = new HashSet<RectInt>();
+    private HashSet<Vector2Int> drawnDoors = new HashSet<Vector2Int>();
 
     void Start()
     {
-        StartCoroutine(GenerateDungeon());
+        StartCoroutine(GenerateDungeonAnimated());
     }
 
-    IEnumerator GenerateDungeon()
+    IEnumerator GenerateDungeonAnimated()
     {
-        rooms.Clear();
         RectInt mainRoom = new RectInt(0, 0, dungeonWidth, dungeonHeight);
-        yield return StartCoroutine(SplitRoom(mainRoom, maxSplits));
+        drawnRooms.Add(mainRoom);
+        yield return new WaitForSeconds(stepDelay);
+
+        SplitRoom(mainRoom, maxSplits);
+        StartCoroutine(AnimateDungeon());
     }
 
-    IEnumerator SplitRoom(RectInt room, int depth)
+    void SplitRoom(RectInt room, int depth)
     {
         if (depth <= 0 || room.width < minRoomSize * 2 || room.height < minRoomSize * 2)
         {
             rooms.Add(room);
-            yield return new WaitForSeconds(stepDelay);
-            yield break;
+            animationQueue.Enqueue(room);
+            return;
         }
 
         bool splitHorizontally = Random.value > 0.5f;
@@ -44,13 +52,8 @@ public class DungeonGenerator : MonoBehaviour
             RectInt room1 = new RectInt(room.x, room.y, room.width, splitY - room.y);
             RectInt room2 = new RectInt(room.x, splitY, room.width, room.y + room.height - splitY);
 
-            rooms.Add(room1);
-            yield return new WaitForSeconds(stepDelay);
-            yield return StartCoroutine(SplitRoom(room1, depth - 1));
-
-            rooms.Add(room2);
-            yield return new WaitForSeconds(stepDelay);
-            yield return StartCoroutine(SplitRoom(room2, depth - 1));
+            SplitRoom(room1, depth - 1);
+            SplitRoom(room2, depth - 1);
         }
         else
         {
@@ -58,21 +61,86 @@ public class DungeonGenerator : MonoBehaviour
             RectInt room1 = new RectInt(room.x, room.y, splitX - room.x, room.height);
             RectInt room2 = new RectInt(splitX, room.y, room.x + room.width - splitX, room.height);
 
-            rooms.Add(room1);
-            yield return new WaitForSeconds(stepDelay);
-            yield return StartCoroutine(SplitRoom(room1, depth - 1));
+            SplitRoom(room1, depth - 1);
+            SplitRoom(room2, depth - 1);
+        }
+    }
 
-            rooms.Add(room2);
+    IEnumerator AnimateDungeon()
+    {
+        while (animationQueue.Count > 0)
+        {
+            RectInt room = animationQueue.Dequeue();
+            drawnRooms.Add(room);
             yield return new WaitForSeconds(stepDelay);
-            yield return StartCoroutine(SplitRoom(room2, depth - 1));
+        }
+
+        AddDoors();
+        StartCoroutine(AnimateDoors());
+    }
+
+    void AddDoors()
+    {
+        HashSet<Vector2Int> placedDoors = new HashSet<Vector2Int>();
+
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            for (int j = i + 1; j < rooms.Count; j++)
+            {
+                RectInt roomA = rooms[i];
+                RectInt roomB = rooms[j];
+
+                if (roomA.xMax == roomB.x && roomA.yMin < roomB.yMax && roomA.yMax > roomB.yMin)
+                {
+                    int minY = Mathf.Max(roomA.yMin, roomB.yMin);
+                    int maxY = Mathf.Min(roomA.yMax, roomB.yMax) - 1;
+
+                    if (maxY > minY)
+                    {
+                        int doorY = Random.Range(minY + 1, maxY);
+                        Vector2Int doorPos = new Vector2Int(roomA.xMax, doorY);
+
+                        if (placedDoors.Add(doorPos))
+                            doors.Add(doorPos);
+                    }
+                }
+
+                else if (roomA.yMax == roomB.y && roomA.xMin < roomB.xMax && roomA.xMax > roomB.xMin)
+                {
+                    int minX = Mathf.Max(roomA.xMin, roomB.xMin);
+                    int maxX = Mathf.Min(roomA.xMax, roomB.xMax) - 1;
+
+                    if (maxX > minX)
+                    {
+                        int doorX = Random.Range(minX + 1, maxX);
+                        Vector2Int doorPos = new Vector2Int(doorX, roomA.yMax);
+
+                        if (placedDoors.Add(doorPos))
+                            doors.Add(doorPos);
+                    }
+                }
+            }
+        }
+    }
+
+    IEnumerator AnimateDoors()
+    {
+        foreach (var door in doors)
+        {
+            drawnDoors.Add(door);
+            yield return new WaitForSeconds(stepDelay);
         }
     }
 
     void Update()
     {
-        foreach (var room in rooms)
+        foreach (var room in drawnRooms)
         {
             AlgorithmsUtils.DebugRectInt(room, Color.red);
+        }
+        foreach (var door in drawnDoors)
+        {
+            AlgorithmsUtils.DebugPoint(door, Color.blue);
         }
     }
 }
