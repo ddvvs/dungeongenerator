@@ -406,11 +406,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 516bb9b732d5f024e99b0b686ee7d9eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dungeonWidth: 30
-  dungeonHeight: 30
-  minRoomSize: 3
-  maxSplits: 10
-  stepDelay: 0.05
+  dungeonWidth: 50
+  dungeonHeight: 50
+  minRoomSize: 5
+  splitDepth: 5
+  drawDebugLines: 1
+  drawDoors: 1
+  drawNodes: 1
+  animationSpeed: 0.05
 --- !u!4 &771648333
 Transform:
   m_ObjectHideFlags: 0
