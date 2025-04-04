@@ -10,7 +10,7 @@ public class DungeonGenerator : MonoBehaviour
     public int minRoomSize = 5;
     public int splitDepth = 4;
 
-    [Header("Debugging & Visualization")]
+    [Header("Debugging")]
     public bool drawDebugLines = true;
     public bool drawDoors = true;
     public bool drawNodes = true;
@@ -56,7 +56,6 @@ public class DungeonGenerator : MonoBehaviour
 
     void SplitRoom(RectInt room, int depth)
     {
-      
         if (depth <= 0 || room.width < minRoomSize * 2 || room.height < minRoomSize * 2) //so if room too small then dont split
         {
             rooms.Add(room);
@@ -128,7 +127,7 @@ public class DungeonGenerator : MonoBehaviour
             int overlapStart = Mathf.Max(room1.y, room2.y);
             int overlapEnd = Mathf.Min(room1.y + room1.height, room2.y + room2.height);
             int doorY = (overlapStart + overlapEnd) / 2;
-            doorPosition = new Vector3(room1.x + room1.width, doorY, 0);
+            doorPosition = new Vector3(room1.x + room1.width, 0, doorY);
             return true;
         }
 
@@ -138,7 +137,7 @@ public class DungeonGenerator : MonoBehaviour
             int overlapStart = Mathf.Max(room1.y, room2.y);
             int overlapEnd = Mathf.Min(room1.y + room1.height, room2.y + room2.height);
             int doorY = (overlapStart + overlapEnd) / 2;
-            doorPosition = new Vector3(room1.x, doorY, 0);
+            doorPosition = new Vector3(room1.x, 0, doorY);
             return true;
         }
 
@@ -148,7 +147,7 @@ public class DungeonGenerator : MonoBehaviour
             int overlapStart = Mathf.Max(room1.x, room2.x);
             int overlapEnd = Mathf.Min(room1.x + room1.width, room2.x + room2.width);
             int doorX = (overlapStart + overlapEnd) / 2;
-            doorPosition = new Vector3(doorX, room1.y + room1.height, 0);
+            doorPosition = new Vector3(doorX, 0, room1.y + room1.height);
             return true;
         }
 
@@ -158,7 +157,7 @@ public class DungeonGenerator : MonoBehaviour
             int overlapStart = Mathf.Max(room1.x, room2.x);
             int overlapEnd = Mathf.Min(room1.x + room1.width, room2.x + room2.width);
             int doorX = (overlapStart + overlapEnd) / 2;
-            doorPosition = new Vector3(doorX, room1.y, 0);
+            doorPosition = new Vector3(doorX, 0, room1.y);
             return true;
         }
 
@@ -191,7 +190,7 @@ public class DungeonGenerator : MonoBehaviour
 
             if (visited.Count != rooms.Count)
             {
-                Debug.LogError("Dungeon is not fully connected!");
+                Debug.LogError("dungeon is not fully connected!");
             }
         }
     }
@@ -221,7 +220,7 @@ public class DungeonGenerator : MonoBehaviour
         {
             foreach (RectInt room in rooms)
             {
-                Vector3 nodePosition = new Vector3(room.x + room.width / 2f, room.y + room.height / 2f, 0);
+                Vector3 nodePosition = new Vector3(room.x + room.width / 2f, 0, room.y + room.height / 2f);
                 yield return StartCoroutine(DrawNodeAnimated(nodePosition));
             }
         }
@@ -230,8 +229,8 @@ public class DungeonGenerator : MonoBehaviour
         {
             foreach (RectInt neighbor in dungeonGraph[room])
             {
-                Vector3 start = new Vector3(room.x + room.width / 2f, room.y + room.height / 2f, 0);
-                Vector3 end = new Vector3(neighbor.x + neighbor.width / 2f, neighbor.y + neighbor.height / 2f, 0);
+                Vector3 start = new Vector3(room.x + room.width / 2f, 0, room.y + room.height / 2f);
+                Vector3 end = new Vector3(neighbor.x + neighbor.width / 2f, 0, neighbor.y + neighbor.height / 2f);
 
                 // gets the door positiobn between the 2 rooms
                 if (AreRoomsAdjacent(room, neighbor, out Vector3 doorPosition))
@@ -244,8 +243,8 @@ public class DungeonGenerator : MonoBehaviour
 
     IEnumerator DrawRoomAnimated(RectInt room)
     {
-        Vector3 start = new Vector3(room.x, room.y, 0);
-        Vector3 end = new Vector3(room.x + room.width, room.y + room.height, 0);
+        Vector3 start = new Vector3(room.x, 0, room.y);
+        Vector3 end = new Vector3(room.x + room.width, 0, room.y + room.height);
         float elapsedTime = 0f;
 
         while (elapsedTime < animationSpeed)
@@ -254,10 +253,10 @@ public class DungeonGenerator : MonoBehaviour
             float t = Mathf.Clamp01(elapsedTime / animationSpeed);
             Vector3 currentEnd = Vector3.Lerp(start, end, t);
 
-            Debug.DrawLine(new Vector3(room.x, room.y, 0), new Vector3(currentEnd.x, room.y, 0), Color.red, Mathf.Infinity); // bottom
-            Debug.DrawLine(new Vector3(room.x, room.y, 0), new Vector3(room.x, currentEnd.y, 0), Color.red, Mathf.Infinity); // left
-            Debug.DrawLine(new Vector3(room.x + room.width, room.y, 0), new Vector3(room.x + room.width, currentEnd.y, 0), Color.red, Mathf.Infinity); // right
-            Debug.DrawLine(new Vector3(room.x, room.y + room.height, 0), new Vector3(room.x + room.width, room.y + room.height, 0), Color.red, Mathf.Infinity); // top
+            Debug.DrawLine(new Vector3(room.x, 0, room.y), new Vector3(currentEnd.x, 0, room.y), Color.red, Mathf.Infinity); // bottom
+            Debug.DrawLine(new Vector3(room.x, 0, room.y), new Vector3(room.x, 0, currentEnd.z), Color.red, Mathf.Infinity); // left
+            Debug.DrawLine(new Vector3(room.x + room.width, 0, room.y), new Vector3(room.x + room.width, 0, currentEnd.z), Color.red, Mathf.Infinity); // right
+            Debug.DrawLine(new Vector3(room.x, 0, room.y + room.height), new Vector3(room.x + room.width, 0, room.y + room.height), Color.red, Mathf.Infinity); // top
             yield return null;
         }
     }
@@ -274,7 +273,7 @@ public class DungeonGenerator : MonoBehaviour
             float t = Mathf.Clamp01(elapsedTime / animationSpeed);
             Vector3 currentEnd = Vector3.Lerp(start, end, t);
 
-            Debug.DrawLine(currentEnd - new Vector3(0, 0.5f, 0), currentEnd + new Vector3(0, 0.5f, 0), Color.blue, Mathf.Infinity);
+            Debug.DrawLine(currentEnd - new Vector3(0, 0, 0.5f), currentEnd + new Vector3(0, 0, 0.5f), Color.blue, Mathf.Infinity);
             Debug.DrawLine(currentEnd - new Vector3(0.5f, 0, 0), currentEnd + new Vector3(0.5f, 0, 0), Color.blue, Mathf.Infinity);
             yield return null;
         }
@@ -293,7 +292,7 @@ public class DungeonGenerator : MonoBehaviour
             size = Mathf.Lerp(0f, maxSize, t);
 
             Debug.DrawLine(nodePosition - new Vector3(size, 0, 0), nodePosition + new Vector3(size, 0, 0), Color.magenta, Mathf.Infinity);
-            Debug.DrawLine(nodePosition - new Vector3(0, size, 0), nodePosition + new Vector3(0, size, 0), Color.magenta, Mathf.Infinity);
+            Debug.DrawLine(nodePosition - new Vector3(0, 0, size), nodePosition + new Vector3(0, 0, size), Color.magenta, Mathf.Infinity);
             yield return null;
         }
     }
@@ -318,4 +317,4 @@ public class DungeonGenerator : MonoBehaviour
             yield return null;
         }
     }
-}   
+}

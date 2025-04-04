@@ -1255,20 +1255,6 @@
       <Private>False</Private>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="NaughtyAttributes.Test.csproj">
-      <Project>{0C704EFE-5469-E983-CCC7-D045906B9E37}</Project>
-      <Name>NaughtyAttributes.Test</Name>
-    </ProjectReference>
-    <ProjectReference Include="NaughtyAttributes.Core.csproj">
-      <Project>{75ACDE32-C5F0-E65B-AD71-28FECF14AF6F}</Project>
-      <Name>NaughtyAttributes.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="NaughtyAttributes.Editor.csproj">
-      <Project>{48FAC353-5F3C-9F62-0561-CD44AFDC7FB4}</Project>
-      <Name>NaughtyAttributes.Editor</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
