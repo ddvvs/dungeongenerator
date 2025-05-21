@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
+using Unity.AI.Navigation;
 
 public class DungeonGenerator : MonoBehaviour
 {
@@ -10,6 +12,11 @@ public class DungeonGenerator : MonoBehaviour
     public int minRoomSize = 5;
     public int splitDepth = 4;
 
+    [Header("Prefabs")]
+    public GameObject wallPrefab;
+    public GameObject floorPrefab;
+    public float floorTileSize = 1f;
+
     [Header("Debugging")]
     public bool drawDebugLines = true;
     public bool drawDoors = true;
@@ -17,8 +24,32 @@ public class DungeonGenerator : MonoBehaviour
     public float animationSpeed = 1f;
 
     private List<RectInt> rooms = new List<RectInt>();
+    private Dictionary<WallPair, Vector3> doorPositions = new Dictionary<WallPair, Vector3>();
+    private HashSet<Vector3> wallPositions = new HashSet<Vector3>();
+    private HashSet<Vector3> floorPositions = new HashSet<Vector3>();
     private Dictionary<RectInt, List<RectInt>> dungeonGraph = new Dictionary<RectInt, List<RectInt>>();
     private Coroutine drawingCoroutine;
+    private NavMeshSurface navMeshSurface;
+
+    private struct WallPair
+    {
+        public RectInt room1;
+        public RectInt room2;
+
+        public WallPair(RectInt r1, RectInt r2)
+        {
+            if (r1.x < r2.x || (r1.x == r2.x && r1.y < r2.y))
+            {
+                room1 = r1;
+                room2 = r2;
+            }
+            else
+            {
+                room1 = r2;
+                room2 = r1;
+            }
+        }
+    }
 
     void Start()
     {
@@ -28,6 +59,9 @@ public class DungeonGenerator : MonoBehaviour
     void GenerateDungeon()
     {
         rooms.Clear();
+        doorPositions.Clear();
+        wallPositions.Clear();
+        floorPositions.Clear();
         dungeonGraph.Clear();
 
         CreateRooms();
@@ -38,61 +72,51 @@ public class DungeonGenerator : MonoBehaviour
         {
             StopCoroutine(drawingCoroutine);
         }
+
         drawingCoroutine = StartCoroutine(DrawDungeonAnimated());
     }
 
     void CreateRooms()
     {
-        RectInt dungeonSpace = new RectInt(0, 0, dungeonWidth, dungeonHeight); //define og dungeon as a rectangle
+        RectInt dungeonSpace = new RectInt(0, 0, dungeonWidth, dungeonHeight);
+        SplitRoom(dungeonSpace, splitDepth);
 
-        SplitRoom(dungeonSpace, splitDepth); //start splitting
-
-        // add rooms as nodes to the graph
         foreach (RectInt room in rooms)
         {
-            dungeonGraph[room] = new List<RectInt>(); // this makes the adjacency list for every room
+            dungeonGraph[room] = new List<RectInt>();
         }
     }
 
     void SplitRoom(RectInt room, int depth)
     {
-        if (depth <= 0 || room.width < minRoomSize * 2 || room.height < minRoomSize * 2) //so if room too small then dont split
+        if (depth <= 0 || room.width < minRoomSize * 2 || room.height < minRoomSize * 2)
         {
             rooms.Add(room);
             return;
         }
 
-        bool splitHorizontally = Random.value > 0.5f; //split vertically or horizontally?
+        bool splitHorizontally = Random.value > 0.5f;
 
-        // split along the longer axis to show more consistency
         if (room.width > room.height)
-        {
             splitHorizontally = false;
-        }
         else if (room.height > room.width)
-        {
             splitHorizontally = true;
-        }
 
         if (splitHorizontally)
         {
-            // horiz split
             int splitY = Random.Range(room.y + minRoomSize, room.y + room.height - minRoomSize);
             RectInt room1 = new RectInt(room.x, room.y, room.width, splitY - room.y);
             RectInt room2 = new RectInt(room.x, splitY, room.width, room.y + room.height - splitY);
 
-            // split new rooms recursively 
             SplitRoom(room1, depth - 1);
             SplitRoom(room2, depth - 1);
         }
         else
         {
-            // vert split
             int splitX = Random.Range(room.x + minRoomSize, room.x + room.width - minRoomSize);
             RectInt room1 = new RectInt(room.x, room.y, splitX - room.x, room.height);
             RectInt room2 = new RectInt(splitX, room.y, room.x + room.width - splitX, room.height);
 
-            // split new rooms recursively 
             SplitRoom(room1, depth - 1);
             SplitRoom(room2, depth - 1);
         }
@@ -100,6 +124,8 @@ public class DungeonGenerator : MonoBehaviour
 
     void CreateDoors()
     {
+        Dictionary<WallPair, List<Vector3>> potentialDoors = new Dictionary<WallPair, List<Vector3>>();
+
         for (int i = 0; i < rooms.Count; i++)
         {
             for (int j = i + 1; j < rooms.Count; j++)
@@ -107,58 +133,89 @@ public class DungeonGenerator : MonoBehaviour
                 RectInt room1 = rooms[i];
                 RectInt room2 = rooms[j];
 
-                // check if rooms are adjacent and add edge between them
-                if (AreRoomsAdjacent(room1, room2, out Vector3 doorPosition))
+                if (GetAdjacentWallPositions(room1, room2, out List<Vector3> positions))
                 {
-                    dungeonGraph[room1].Add(room2);
-                    dungeonGraph[room2].Add(room1);
+                    WallPair wall = new WallPair(room1, room2);
+                    potentialDoors[wall] = positions;
                 }
+            }
+        }
+
+        foreach (var wall in potentialDoors)
+        {
+            if (wall.Value.Count > 0)
+            {
+                Vector3 doorPos = wall.Value[Random.Range(0, wall.Value.Count)];
+                doorPositions[wall.Key] = doorPos;
+
+                dungeonGraph[wall.Key.room1].Add(wall.Key.room2);
+                dungeonGraph[wall.Key.room2].Add(wall.Key.room1);
             }
         }
     }
 
-    bool AreRoomsAdjacent(RectInt room1, RectInt room2, out Vector3 doorPosition)
+    bool GetAdjacentWallPositions(RectInt room1, RectInt room2, out List<Vector3> positions)
     {
-        doorPosition = Vector3.zero;
+        positions = new List<Vector3>();
 
-        // check if room2 is to the right of room1
-        if (room1.x + room1.width == room2.x && room1.y < room2.y + room2.height && room1.y + room1.height > room2.y)
+        if (room1.x + room1.width == room2.x)
         {
             int overlapStart = Mathf.Max(room1.y, room2.y);
             int overlapEnd = Mathf.Min(room1.y + room1.height, room2.y + room2.height);
-            int doorY = (overlapStart + overlapEnd) / 2;
-            doorPosition = new Vector3(room1.x + room1.width, 0, doorY);
-            return true;
+
+            if (overlapStart < overlapEnd)
+            {
+                for (int y = overlapStart + 1; y < overlapEnd; y++)
+                {
+                    positions.Add(new Vector3(room1.x + room1.width, 0, y));
+                }
+                return true;
+            }
         }
 
-        // check if room2 is to the left of room1
-        if (room2.x + room2.width == room1.x && room1.y < room2.y + room2.height && room1.y + room1.height > room2.y)
+        if (room2.x + room2.width == room1.x)
         {
             int overlapStart = Mathf.Max(room1.y, room2.y);
             int overlapEnd = Mathf.Min(room1.y + room1.height, room2.y + room2.height);
-            int doorY = (overlapStart + overlapEnd) / 2;
-            doorPosition = new Vector3(room1.x, 0, doorY);
-            return true;
+
+            if (overlapStart < overlapEnd)
+            {
+                for (int y = overlapStart + 1; y < overlapEnd; y++)
+                {
+                    positions.Add(new Vector3(room1.x, 0, y));
+                }
+                return true;
+            }
         }
 
-        // check if room2 is above room1
-        if (room1.y + room1.height == room2.y && room1.x < room2.x + room2.width && room1.x + room1.width > room2.x)
+        if (room1.y + room1.height == room2.y)
         {
             int overlapStart = Mathf.Max(room1.x, room2.x);
             int overlapEnd = Mathf.Min(room1.x + room1.width, room2.x + room2.width);
-            int doorX = (overlapStart + overlapEnd) / 2;
-            doorPosition = new Vector3(doorX, 0, room1.y + room1.height);
-            return true;
+
+            if (overlapStart < overlapEnd)
+            {
+                for (int x = overlapStart + 1; x < overlapEnd; x++)
+                {
+                    positions.Add(new Vector3(x, 0, room1.y + room1.height));
+                }
+                return true;
+            }
         }
 
-        // check if room2 is below room1
-        if (room2.y + room2.height == room1.y && room1.x < room2.x + room2.width && room1.x + room1.width > room2.x)
+        if (room2.y + room2.height == room1.y)
         {
             int overlapStart = Mathf.Max(room1.x, room2.x);
             int overlapEnd = Mathf.Min(room1.x + room1.width, room2.x + room2.width);
-            int doorX = (overlapStart + overlapEnd) / 2;
-            doorPosition = new Vector3(doorX, 0, room1.y);
-            return true;
+
+            if (overlapStart < overlapEnd)
+            {
+                for (int x = overlapStart + 1; x < overlapEnd; x++)
+                {
+                    positions.Add(new Vector3(x, 0, room1.y));
+                }
+                return true;
+            }
         }
 
         return false;
@@ -190,7 +247,7 @@ public class DungeonGenerator : MonoBehaviour
 
             if (visited.Count != rooms.Count)
             {
-                Debug.LogError("dungeon is not fully connected!");
+                Debug.LogError("dungeon not fully connected");
             }
         }
     }
@@ -204,15 +261,9 @@ public class DungeonGenerator : MonoBehaviour
 
         if (drawDoors)
         {
-            foreach (var room in dungeonGraph.Keys)
+            foreach (var door in doorPositions.Values)
             {
-                foreach (RectInt neighbor in dungeonGraph[room])
-                {
-                    if (AreRoomsAdjacent(room, neighbor, out Vector3 doorPosition))
-                    {
-                        yield return StartCoroutine(DrawDoorAnimated(doorPosition));
-                    }
-                }
+                yield return StartCoroutine(DrawDoorAnimated(door));
             }
         }
 
@@ -225,40 +276,89 @@ public class DungeonGenerator : MonoBehaviour
             }
         }
 
-        foreach (var room in dungeonGraph.Keys)
+        foreach (var connection in doorPositions)
         {
-            foreach (RectInt neighbor in dungeonGraph[room])
-            {
-                Vector3 start = new Vector3(room.x + room.width / 2f, 0, room.y + room.height / 2f);
-                Vector3 end = new Vector3(neighbor.x + neighbor.width / 2f, 0, neighbor.y + neighbor.height / 2f);
+            Vector3 start = new Vector3(
+                connection.Key.room1.x + connection.Key.room1.width / 2f,
+                0,
+                connection.Key.room1.y + connection.Key.room1.height / 2f);
+            Vector3 end = new Vector3(
+                connection.Key.room2.x + connection.Key.room2.width / 2f,
+                0,
+                connection.Key.room2.y + connection.Key.room2.height / 2f);
 
-                // gets the door positiobn between the 2 rooms
-                if (AreRoomsAdjacent(room, neighbor, out Vector3 doorPosition))
-                {
-                    yield return StartCoroutine(DrawEdgeAnimated(start, end, doorPosition));
-                }
-            }
+            yield return StartCoroutine(DrawEdgeAnimated(start, end, connection.Value));
         }
+
+        yield return new WaitForEndOfFrame();
+        navMeshSurface = gameObject.AddComponent<NavMeshSurface>();
+        navMeshSurface.collectObjects = CollectObjects.All;
+        navMeshSurface.BuildNavMesh();
     }
 
     IEnumerator DrawRoomAnimated(RectInt room)
     {
-        Vector3 start = new Vector3(room.x, 0, room.y);
-        Vector3 end = new Vector3(room.x + room.width, 0, room.y + room.height);
         float elapsedTime = 0f;
+
+        if (drawDebugLines)
+        {
+            Vector3 bottomLeft = new Vector3(room.x, 0, room.y);
+            Vector3 bottomRight = new Vector3(room.x + room.width, 0, room.y);
+            Vector3 topLeft = new Vector3(room.x, 0, room.y + room.height);
+            Vector3 topRight = new Vector3(room.x + room.width, 0, room.y + room.height);
+
+            Debug.DrawLine(bottomLeft, bottomRight, Color.red, Mathf.Infinity);
+            Debug.DrawLine(bottomLeft, topLeft, Color.red, Mathf.Infinity);
+            Debug.DrawLine(bottomRight, topRight, Color.red, Mathf.Infinity);
+            Debug.DrawLine(topLeft, topRight, Color.red, Mathf.Infinity);
+        }
 
         while (elapsedTime < animationSpeed)
         {
             elapsedTime += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsedTime / animationSpeed);
-            Vector3 currentEnd = Vector3.Lerp(start, end, t);
 
-            Debug.DrawLine(new Vector3(room.x, 0, room.y), new Vector3(currentEnd.x, 0, room.y), Color.red, Mathf.Infinity); // bottom
-            Debug.DrawLine(new Vector3(room.x, 0, room.y), new Vector3(room.x, 0, currentEnd.z), Color.red, Mathf.Infinity); // left
-            Debug.DrawLine(new Vector3(room.x + room.width, 0, room.y), new Vector3(room.x + room.width, 0, currentEnd.z), Color.red, Mathf.Infinity); // right
-            Debug.DrawLine(new Vector3(room.x, 0, room.y + room.height), new Vector3(room.x + room.width, 0, room.y + room.height), Color.red, Mathf.Infinity); // top
+            for (int x = room.x; x < room.x + room.width; x++)
+            {
+                for (int y = room.y; y < room.y + room.height; y++)
+                {
+                    Vector3 floorPos = new Vector3(x + 0.5f, 0, y + 0.5f);
+                    if (!floorPositions.Contains(floorPos))
+                    {
+                        Instantiate(floorPrefab, floorPos, Quaternion.Euler(90f, 0f, 0f));
+                        floorPositions.Add(floorPos);
+                    }
+                }
+            }
+
+            for (int i = room.x; i <= room.x + room.width; i++)
+            {
+                Vector3 bottom = new Vector3(i * floorTileSize, 0, room.y * floorTileSize);
+                Vector3 top = new Vector3(i * floorTileSize, 0, (room.y + room.height) * floorTileSize);
+                if (!IsDoorPosition(bottom) && !wallPositions.Contains(bottom)) { Instantiate(wallPrefab, bottom, Quaternion.identity); wallPositions.Add(bottom); }
+                if (!IsDoorPosition(top) && !wallPositions.Contains(top)) { Instantiate(wallPrefab, top, Quaternion.identity); wallPositions.Add(top); }
+            }
+
+            for (int i = room.y; i <= room.y + room.height; i++)
+            {
+                Vector3 left = new Vector3(room.x * floorTileSize, 0, i * floorTileSize);
+                Vector3 right = new Vector3((room.x + room.width) * floorTileSize, 0, i * floorTileSize);
+                if (!IsDoorPosition(left) && !wallPositions.Contains(left)) { Instantiate(wallPrefab, left, Quaternion.identity); wallPositions.Add(left); }
+                if (!IsDoorPosition(right) && !wallPositions.Contains(right)) { Instantiate(wallPrefab, right, Quaternion.identity); wallPositions.Add(right); }
+            }
+
             yield return null;
         }
+    }
+
+
+    bool IsDoorPosition(Vector3 position)
+    {
+        foreach (var doorPos in doorPositions.Values)
+        {
+            if (Vector3.Distance(doorPos, position) < 0.1f)
+                return true;
+        }
+        return false;
     }
 
     IEnumerator DrawDoorAnimated(Vector3 doorPosition)
@@ -272,7 +372,6 @@ public class DungeonGenerator : MonoBehaviour
             elapsedTime += Time.deltaTime;
             float t = Mathf.Clamp01(elapsedTime / animationSpeed);
             Vector3 currentEnd = Vector3.Lerp(start, end, t);
-
             Debug.DrawLine(currentEnd - new Vector3(0, 0, 0.5f), currentEnd + new Vector3(0, 0, 0.5f), Color.blue, Mathf.Infinity);
             Debug.DrawLine(currentEnd - new Vector3(0.5f, 0, 0), currentEnd + new Vector3(0.5f, 0, 0), Color.blue, Mathf.Infinity);
             yield return null;
@@ -288,11 +387,8 @@ public class DungeonGenerator : MonoBehaviour
         while (elapsedTime < animationSpeed)
         {
             elapsedTime += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsedTime / animationSpeed);
-            size = Mathf.Lerp(0f, maxSize, t);
-
-            Debug.DrawLine(nodePosition - new Vector3(size, 0, 0), nodePosition + new Vector3(size, 0, 0), Color.magenta, Mathf.Infinity);
-            Debug.DrawLine(nodePosition - new Vector3(0, 0, size), nodePosition + new Vector3(0, 0, size), Color.magenta, Mathf.Infinity);
+            size = Mathf.Lerp(0f, maxSize, Mathf.Clamp01(elapsedTime / animationSpeed));
+            Debug.DrawRay(nodePosition + new Vector3(0, size, 0), Vector3.up * size, Color.red, Mathf.Infinity);
             yield return null;
         }
     }
@@ -306,11 +402,9 @@ public class DungeonGenerator : MonoBehaviour
             elapsedTime += Time.deltaTime;
             float t = Mathf.Clamp01(elapsedTime / animationSpeed);
 
-            // draw 1st segment from the center of room1 to door
             Vector3 currentDoor = Vector3.Lerp(start, doorPosition, t);
             Debug.DrawLine(start, currentDoor, Color.green, Mathf.Infinity);
 
-            // draw 1st segment from the door to center of room2
             Vector3 currentEnd = Vector3.Lerp(doorPosition, end, t);
             Debug.DrawLine(doorPosition, currentEnd, Color.green, Mathf.Infinity);
 
