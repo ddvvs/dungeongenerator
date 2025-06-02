@@ -10,7 +10,7 @@ public class DungeonGenerator : MonoBehaviour
     public int dungeonWidth = 50;
     public int dungeonHeight = 50;
     public int minRoomSize = 5;
-    public int splitDepth = 4;
+    public int splitDepth = 99999999;
 
     [Header("Prefabs")]
     public GameObject wallPrefab;
@@ -92,7 +92,7 @@ public class DungeonGenerator : MonoBehaviour
     void SplitRoom(RectInt room, int depth)
     {
         // if max depth/room too small to split stop
-        if (depth <= 0 || room.width < minRoomSize * 2 || room.height < minRoomSize * 2)
+        if (depth <= 0 || (room.width < minRoomSize * 2 && room.height < minRoomSize * 2))
         {
             rooms.Add(room);
             return;
