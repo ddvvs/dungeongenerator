@@ -12,15 +12,21 @@ public class SmoothFollowCamera : MonoBehaviour
     public float minVerticalAngle = -40f;
     public float maxVerticalAngle = 80f;
 
+    public float zoomSpeed = 2f;
+    public float minZoom = 2f;
+    public float maxZoom = 15f;
+    private float currentZoomDistance;
+
     void Start()
     {
         if (target != null)
         {
             offset = transform.position - target.position;
+            currentZoomDistance = offset.magnitude;
         }
         else
         {
-            Debug.LogError("Target not assigned in SmoothFollowCamera script.");
+            Debug.LogError("not assigned");
         }
     }
 
@@ -38,9 +44,13 @@ public class SmoothFollowCamera : MonoBehaviour
                 currentVerticalAngle = Mathf.Clamp(currentVerticalAngle, minVerticalAngle, maxVerticalAngle);
             }
 
-            Quaternion rotation = Quaternion.Euler(currentVerticalAngle, currentRotationAngle, 0);
+            float scroll = Input.GetAxis("Mouse ScrollWheel");
+            currentZoomDistance -= scroll * zoomSpeed;
+            currentZoomDistance = Mathf.Clamp(currentZoomDistance, minZoom, maxZoom);
 
-            Vector3 desiredPosition = target.position + rotation * offset;
+            Quaternion rotation = Quaternion.Euler(currentVerticalAngle, currentRotationAngle, 0);
+            Vector3 direction = rotation * Vector3.forward;
+            Vector3 desiredPosition = target.position - direction * currentZoomDistance;
 
             transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
 

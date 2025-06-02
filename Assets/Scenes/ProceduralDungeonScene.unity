@@ -274,6 +274,9 @@ MonoBehaviour:
   rotationSpeed: 5
   minVerticalAngle: -40
   maxVerticalAngle: 80
+  zoomSpeed: 8.87
+  minZoom: 2
+  maxZoom: 105.04
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0

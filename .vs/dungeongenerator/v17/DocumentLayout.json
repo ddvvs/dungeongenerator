@@ -3,20 +3,20 @@
   "WorkspaceRootPath": "C:\\Users\\ghoul\\Documents\\GitHub\\dungeongenerator\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ghoul\\Documents\\GitHub\\dungeongenerator\\Assets\\Scripts\\SmoothFollowCamera.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scripts\\SmoothFollowCamera.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{DE38EEFB-104D-C124-B51E-4B59AF97D94A}|Assembly-CSharp.csproj|c:\\users\\ghoul\\documents\\github\\dungeongenerator\\assets\\scripts\\dungeongenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE38EEFB-104D-C124-B51E-4B59AF97D94A}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\dungeongenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ghoul\\Documents\\GitHub\\dungeongenerator\\Assets\\Scripts\\DungeonGenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scripts\\DungeonGenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{DE38EEFB-104D-C124-B51E-4B59AF97D94A}|Assembly-CSharp.csproj|C:\\Users\\ghoul\\Documents\\GitHub\\dungeongenerator\\Assets\\Scripts\\PlayerController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE38EEFB-104D-C124-B51E-4B59AF97D94A}|Assembly-CSharp.csproj|solutionrelative:Assets\\Scripts\\PlayerController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ghoul\\Documents\\GitHub\\dungeongenerator\\Assets\\Scripts\\PlayerController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scripts\\PlayerController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{DE38EEFB-104D-C124-B51E-4B59AF97D94A}|Assembly-CSharp.csproj|C:\\Users\\ghoul\\Documents\\GitHub\\dungeongenerator\\Assets\\Scripts\\MouseClickController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE38EEFB-104D-C124-B51E-4B59AF97D94A}|Assembly-CSharp.csproj|solutionrelative:Assets\\Scripts\\MouseClickController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\ghoul\\Documents\\GitHub\\dungeongenerator\\Assets\\Scripts\\MouseClickController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scripts\\MouseClickController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{DE38EEFB-104D-C124-B51E-4B59AF97D94A}|Assembly-CSharp.csproj|C:\\Users\\ghoul\\Documents\\GitHub\\dungeongenerator\\Assets\\Scripts\\SmoothFollowCamera.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DE38EEFB-104D-C124-B51E-4B59AF97D94A}|Assembly-CSharp.csproj|solutionrelative:Assets\\Scripts\\SmoothFollowCamera.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,11 +26,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "PlayerController.cs",
               "DocumentMoniker": "C:\\Users\\ghoul\\Documents\\GitHub\\dungeongenerator\\Assets\\Scripts\\PlayerController.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\PlayerController.cs",
@@ -38,12 +38,11 @@
               "RelativeToolTip": "Assets\\Scripts\\PlayerController.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-16T17:12:37.141Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-16T17:12:37.141Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "MouseClickController.cs",
               "DocumentMoniker": "C:\\Users\\ghoul\\Documents\\GitHub\\dungeongenerator\\Assets\\Scripts\\MouseClickController.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\MouseClickController.cs",
@@ -51,31 +50,29 @@
               "RelativeToolTip": "Assets\\Scripts\\MouseClickController.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAACMAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-16T17:12:20.703Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-16T17:12:20.703Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "SmoothFollowCamera.cs",
               "DocumentMoniker": "C:\\Users\\ghoul\\Documents\\GitHub\\dungeongenerator\\Assets\\Scripts\\SmoothFollowCamera.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\SmoothFollowCamera.cs",
               "ToolTip": "C:\\Users\\ghoul\\Documents\\GitHub\\dungeongenerator\\Assets\\Scripts\\SmoothFollowCamera.cs",
               "RelativeToolTip": "Assets\\Scripts\\SmoothFollowCamera.cs",
-              "ViewState": "AgIAABMAAAAAAAAAAAAYwDoAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-16T17:05:39.393Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-04-16T17:05:39.393Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "DungeonGenerator.cs",
               "DocumentMoniker": "C:\\Users\\ghoul\\Documents\\GitHub\\dungeongenerator\\Assets\\Scripts\\DungeonGenerator.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\DungeonGenerator.cs",
               "ToolTip": "C:\\Users\\ghoul\\Documents\\GitHub\\dungeongenerator\\Assets\\Scripts\\DungeonGenerator.cs",
               "RelativeToolTip": "Assets\\Scripts\\DungeonGenerator.cs",
-              "ViewState": "AgIAAIEBAAAAAAAAAAAYwJ8BAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAIABAAAAAAAAAADgv50BAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-17T13:12:24.273Z",
               "EditorCaption": ""
