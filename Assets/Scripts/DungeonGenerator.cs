@@ -354,13 +354,13 @@ public class DungeonGenerator : MonoBehaviour
                 Vector3 top = new Vector3(i * floorTileSize, 0, (room.y + room.height) * floorTileSize);
 
                 //instantiate wall if not door position (also prevent dupes lol)
-                if (!IsDoorPosition(bottom) && !wallPositions.Contains(bottom)) 
-                { 
+                if (!IsDoorPosition(bottom) && !wallPositions.Contains(bottom))
+                {
                     Instantiate(wallPrefab, bottom, Quaternion.identity); wallPositions.Add(bottom);
                 }
                 if (!IsDoorPosition(top) && !wallPositions.Contains(top))
-                { 
-                    Instantiate(wallPrefab, top, Quaternion.identity); wallPositions.Add(top); 
+                {
+                    Instantiate(wallPrefab, top, Quaternion.identity); wallPositions.Add(top);
                 }
             }
 
@@ -370,13 +370,13 @@ public class DungeonGenerator : MonoBehaviour
                 Vector3 right = new Vector3((room.x + room.width) * floorTileSize, 0, i * floorTileSize);
 
                 //instantiate wall if not door position (also prevent dupes lol)
-                if (!IsDoorPosition(left) && !wallPositions.Contains(left)) 
-                { 
-                    Instantiate(wallPrefab, left, Quaternion.identity); wallPositions.Add(left); 
+                if (!IsDoorPosition(left) && !wallPositions.Contains(left))
+                {
+                    Instantiate(wallPrefab, left, Quaternion.identity); wallPositions.Add(left);
                 }
-                if (!IsDoorPosition(right) && !wallPositions.Contains(right)) 
-                { 
-                    Instantiate(wallPrefab, right, Quaternion.identity); wallPositions.Add(right); 
+                if (!IsDoorPosition(right) && !wallPositions.Contains(right))
+                {
+                    Instantiate(wallPrefab, right, Quaternion.identity); wallPositions.Add(right);
                 }
             }
 
